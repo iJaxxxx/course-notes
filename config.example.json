@@ -1,0 +1,70 @@
+{
+  "_说明": "复制为 config.json 后修改。llm 填下面 profiles 里的一个名字。key 推荐放环境变量（api_key_env），不要把真 key 写进要分享的文件。",
+  "llm": "deepseek",
+  "profiles": {
+    "deepseek": {
+      "provider": "openai_compatible",
+      "base_url": "https://api.deepseek.com",
+      "model": "deepseek-flash",
+      "api_key_env": "DEEPSEEK_API_KEY",
+      "_说明": "platform.deepseek.com 申请 key；更强但更贵的可改 deepseek-v4-pro"
+    },
+    "qwen": {
+      "provider": "openai_compatible",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "model": "qwen-plus",
+      "api_key_env": "DASHSCOPE_API_KEY",
+      "_说明": "阿里云百炼申请 key，模型名以百炼控制台为准"
+    },
+    "glm": {
+      "provider": "openai_compatible",
+      "base_url": "https://open.bigmodel.cn/api/paas/v4",
+      "model": "",
+      "api_key_env": "ZHIPU_API_KEY",
+      "_说明": "智谱开放平台申请 key，model 填控制台里的模型名"
+    },
+    "doubao": {
+      "provider": "openai_compatible",
+      "base_url": "https://ark.cn-beijing.volces.com/api/v3",
+      "model": "",
+      "api_key_env": "ARK_API_KEY",
+      "_说明": "火山方舟申请 key，model 填方舟控制台里的模型 ID 或接入点 ID"
+    },
+    "kimi": {
+      "provider": "openai_compatible",
+      "base_url": "https://api.moonshot.cn/v1",
+      "model": "",
+      "api_key_env": "MOONSHOT_API_KEY",
+      "_说明": "Moonshot 开放平台申请 key，model 填控制台里的模型名"
+    },
+    "claude": {
+      "provider": "anthropic",
+      "model": "claude-haiku-5-5",
+      "api_key_env": "ANTHROPIC_API_KEY",
+      "_说明": "Claude 官方 API。便宜用 claude-haiku-5-5，更好用 claude-sonnet-5-5 / claude-opus-5-5"
+    },
+    "claude_cli": {
+      "provider": "claude_cli",
+      "model": "",
+      "_说明": "用本机已登录的 Claude Code（claude -p），不需要 key；model 留空用默认模型"
+    }
+  },
+  "glossary": [],
+  "_glossary_说明": "课程里常出现的专有名词（英文产品名、术语），帮助模型纠正转写错字。可留空。",
+  "output": {
+    "notes_dir": "~/CourseNotes",
+    "docx_dir": "~/Desktop/CourseNotes"
+  },
+  "audio": {
+    "device": "BlackHole"
+  },
+  "end_detect": {
+    "grace_sec": 180,
+    "cancel_chars": 450,
+    "silence_min": 8
+  },
+  "summary": {
+    "interval_min": 8,
+    "max_tokens": 8000
+  }
+}

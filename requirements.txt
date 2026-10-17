@@ -1,0 +1,17 @@
+# 本地转写
+funasr>=1.1
+modelscope
+torch
+torchaudio
+numpy
+scipy
+sounddevice
+# 大模型（按 config.json 里用到的 provider 装，默认都装上）
+openai
+anthropic
+# Word 导出
+python-docx
+# 可选：PPT 截图 OCR（--slides）
+ocrmac
+pyobjc-framework-Quartz
+Pillow
