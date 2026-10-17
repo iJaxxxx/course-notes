@@ -1,0 +1,29 @@
+name: 功能建议
+description: 想要新功能，或者改进现有功能
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 遇到了什么不方便
+      description: 先说场景和问题，不用急着给方案
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: 你希望怎么解决
+  - type: dropdown
+    id: edition
+    attributes:
+      label: 涉及哪个版本
+      multiple: true
+      options:
+        - macOS App 版
+        - Python 命令行版
+  - type: checkboxes
+    id: pr
+    attributes:
+      label: 参与
+      options:
+        - label: 我愿意自己提 PR 实现

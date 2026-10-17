@@ -99,3 +99,9 @@ cd course-notes
 - **想同时抓 PPT 文字**：加 `--slides`，第一次需要在「隐私与安全性 → 屏幕录制」里给终端授权
 
 只用于个人学习笔记，请勿对外分发课程内容。
+
+## 参与贡献与许可证
+
+欢迎提 Issue 和 PR，参与方式见 [CONTRIBUTING.md](CONTRIBUTING.md)。代码按 [MIT 许可证](LICENSE) 开源。
+
+本仓库只包含工具代码，不接收任何课程录音、转写稿或课程总结。
