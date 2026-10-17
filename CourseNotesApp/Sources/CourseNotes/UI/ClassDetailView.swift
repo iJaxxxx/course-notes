@@ -8,6 +8,10 @@ struct ClassDetailView: View {
     let record: ClassRecord
     @State private var tab = 0
     @State private var player: AVPlayer?
+    // 转写稿和总结在后台读一次存起来：body 会随 session 的每次变化重算，不能每次都读文件
+    @State private var loaded = false
+    @State private var transcript: [String] = []
+    @State private var summaryHTML: String?
 
     private var busy: Bool { session.busyRecordID == record.id }
 
@@ -27,6 +31,21 @@ struct ClassDetailView: View {
             if let a = record.audioURL { player = AVPlayer(url: a) }
         }
         .onDisappear { player?.pause() }
+        .task(id: busy) { await load() }  // 生成总结结束时 busy 变回 false，重新读一次
+    }
+
+    private func load() async {
+        let r = record
+        let (lines, html) = await Task.detached(priority: .userInitiated) {
+            let lines = ClassStore.transcriptBody(r.transcriptURL)
+                .components(separatedBy: "\n\n")
+                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                .filter { !$0.isEmpty }
+            return (lines, r.summary.map { Self.page(MarkdownHTML.render($0)) })
+        }.value
+        transcript = lines
+        summaryHTML = html
+        loaded = true
     }
 
     private var header: some View {
@@ -73,9 +92,11 @@ struct ClassDetailView: View {
     }
 
     @ViewBuilder private var content: some View {
-        if tab == 0 {
-            if let md = record.summary {
-                HTMLView(html: Self.page(MarkdownHTML.render(md)))
+        if !loaded {
+            ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else if tab == 0 {
+            if let summaryHTML {
+                HTMLView(html: summaryHTML)
             } else {
                 ContentUnavailableView {
                     Label("还没有总结", systemImage: "doc.text.magnifyingglass")
@@ -87,22 +108,29 @@ struct ClassDetailView: View {
                         .disabled(session.isBusy || busy)
                 }
             }
+        } else if transcript.isEmpty {
+            ContentUnavailableView("没有转写内容", systemImage: "text.alignleft")
         } else {
+            // 一节两小时的课有几万字，整段放进一个可选中的 Text 会卡住好几秒；按句子拆开懒加载
             ScrollView {
-                Text(ClassStore.transcriptBody(record.transcriptURL).isEmpty ? "（没有转写内容）"
-                     : ClassStore.transcriptBody(record.transcriptURL))
-                    .textSelection(.enabled)
-                    .font(.body)
-                    .lineSpacing(5)
-                    .frame(maxWidth: 760, alignment: .leading)
-                    .padding(24)
-                    .frame(maxWidth: .infinity)
+                LazyVStack(alignment: .leading, spacing: 14) {
+                    ForEach(transcript.indices, id: \.self) { i in
+                        Text(transcript[i])
+                            .textSelection(.enabled)
+                            .font(.body)
+                            .lineSpacing(5)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+                .frame(maxWidth: 760, alignment: .leading)
+                .padding(24)
+                .frame(maxWidth: .infinity)
             }
         }
     }
 
     /// 应用内预览用的样式：跟随系统深浅色
-    static func page(_ body: String) -> String {
+    nonisolated static func page(_ body: String) -> String {
         """
         <!doctype html><html><head><meta charset="utf-8"><style>
         :root { color-scheme: light dark; --accent: #0A66C2; --line: rgba(128,128,128,.28); --head: rgba(10,102,194,.10); }
@@ -171,7 +199,16 @@ struct HTMLView: NSViewRepresentable {
         return v
     }
 
+    func makeCoordinator() -> Coordinator { Coordinator() }
+
     func updateNSView(_ v: WKWebView, context: Context) {
+        // 内容没变就不重新加载，否则每次界面刷新都会闪一下、滚动位置也会丢
+        guard context.coordinator.html != html else { return }
+        context.coordinator.html = html
         v.loadHTMLString(html, baseURL: nil)
+    }
+
+    final class Coordinator {
+        var html: String?
     }
 }
