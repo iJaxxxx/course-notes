@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  app:
+    name: macOS App 编译
+    # App 依赖 macOS 26 SDK（SpeechTranscriber），需要带 Xcode 26 的 runner
+    runs-on: macos-26
+    defaults:
+      run:
+        working-directory: CourseNotesApp
+    steps:
+      - uses: actions/checkout@v4
+      - name: Swift 版本
+        run: swift --version
+      - name: 编译
+        run: swift build -c release --arch arm64
+
+  python:
+    name: Python 语法检查
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # 3.9 是 macOS 自带的版本
+        python-version: ["3.9", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: 语法检查
+        run: python -m py_compile course_notes.py llm.py md2docx.py
+      - name: 检查语法错误和未定义的名字
+        run: |
+          pip install ruff
+          ruff check --select E9,F63,F7,F82 --output-format github .

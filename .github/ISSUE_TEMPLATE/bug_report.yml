@@ -1,0 +1,64 @@
+name: 问题反馈
+description: 录音、转写、下课检测、总结或导出出了问题
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        贴日志和截图前，请检查里面**没有 API Key**，也**不要贴课程录音或转写原文**（可以换成无关文字）。
+  - type: dropdown
+    id: edition
+    attributes:
+      label: 用的是哪个版本
+      options:
+        - macOS App 版
+        - Python 命令行版
+    validations:
+      required: true
+  - type: dropdown
+    id: stage
+    attributes:
+      label: 出问题的环节
+      options:
+        - 录音（没声音、录音文件打不开、中途断了）
+        - 转写（转不出来、错字很多、漏句子）
+        - 自动下课（误判、没识别到）
+        - 课程总结（失败、内容不全、格式不对）
+        - 导出 Word
+        - 安装、权限、打包
+        - 其他
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: 发生了什么
+      description: 你做了哪些操作，期望看到什么，实际看到了什么
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 怎么复现
+      placeholder: |
+        1. 录制来源选「电脑声音」
+        2. 录了大约 40 分钟后点结束
+        3. ……
+  - type: input
+    id: macos
+    attributes:
+      label: macOS 版本和芯片
+      placeholder: macOS 26.1，M2
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: 录制来源 / 总结模型
+      placeholder: 电脑声音；DeepSeek deepseek-chat
+  - type: textarea
+    id: logs
+    attributes:
+      label: 报错信息或截图
+      description: App 里的提示文字、终端输出等
+      render: text
